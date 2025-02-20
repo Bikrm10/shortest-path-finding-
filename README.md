@@ -1,5 +1,3 @@
-# shortest-path-finding-
-This is location based shortest path finding , applied in openstreet google map
 # Shortest Path Finding in OpenStreetMap Data
 
 ## Overview
@@ -18,12 +16,12 @@ This project implements a shortest path finding algorithm using OpenStreetMap (O
   - `osmnx`
   - `networkx`
   - `matplotlib`
-  - `geopandas`
-  - `shapely`
+  - `geopy`
+    
 
 To install dependencies, run:
 ```sh
-pip install osmnx networkx matplotlib geopandas shapely
+pip install -r requirements.txt
 ```
 
 ## Usage
@@ -31,32 +29,40 @@ pip install osmnx networkx matplotlib geopandas shapely
 You can download OpenStreetMap data using the `osmnx` library:
 ```python
 import osmnx as ox
-G = ox.graph_from_place("New York City, USA", network_type="drive")
+import networkx as nx
+
+# Define location (Nepal) and transport mode (driving, walking, biking)
+place_name = "Kathmandu Nepal"
+G = ox.graph_from_place(place_name, network_type="drive")
 ```
 
 ### 2. Find the Shortest Path
 ```python
 import networkx as nx
+start_node = 1127867287
+end_node = 1924770845
 
-# Define origin and destination coordinates
-orig = (40.748817, -73.985428)  # Example: Empire State Building
-dest = (40.712776, -74.005974)  # Example: One World Trade Center
+# Check if nodes exist in the graph
+if start_node not in place or end_node not in place:
+    raise ValueError("One or both node IDs are not in the graph!")
 
-# Get nearest nodes in the graph
-orig_node = ox.distance.nearest_nodes(G, orig[1], orig[0])
-dest_node = ox.distance.nearest_nodes(G, dest[1], dest[0])
+# Step 3: Find the shortest path between them
+try:
+    route = nx.shortest_path(place, source=start_node, target=end_node, weight="length")
+except nx.NetworkXNoPath:
+    raise ValueError("No path found between the given nodes!")
 
-# Compute shortest path using Dijkstra's algorithm
-route = nx.shortest_path(G, orig_node, dest_node, weight='length')
+# Step 4: Plot the graph with the highlighted route
+fig, ax = ox.plot_graph_routes(place, [route], route_colors=["red"], route_linewidth=5, node_size=0, show=False, close=False)
 
-# Plot the route
-ox.plot_graph_route(G, route, node_size=0)
+# Display the plot
+plt.show()
 ```
 
 ### 3. Running the Application
 To run the shortest path finder as a script, execute:
 ```sh
-python shortest_path.py
+python shortest_path.ipynb
 ```
 
 ## Dataset
